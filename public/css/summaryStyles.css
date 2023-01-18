@@ -1,0 +1,31 @@
+.logo{
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    margin-right: 1em;
+}
+
+/* .change-container{
+    padding: 0;
+    border: 1px solid red;
+    display: flex;
+} */
+.arrow-container{
+
+}
+
+.arrow{
+    display: none;
+}
+
+.arrow-show{
+    display: inline-block;
+}
+
+.positiveChange{
+    color: #16c784;
+}
+
+.negativeChange{
+    color: #ea3943;
+}
