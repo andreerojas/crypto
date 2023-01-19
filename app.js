@@ -5,21 +5,37 @@ const axios = require('axios');
 const { application } = require('express');
 require('dotenv').config();
 const session = require('express-session');
+const mongoose = require('mongoose');
+const mongoSessionStore = require('connect-mongo');
+
+mongoose.connect('mongodb://127.0.0.1:27017/crypto')
+    .then(()=>{
+        console.log("CONNECTED TO DATABASE");
+    })
+    .catch(e =>{
+        console.log("ERROR CONNECTING TO DATABASE");        
+    });
+const mongoClient = mongoose.connection.getClient();
 
 const port = 3000;
 const baseURL = "https://pro-api.coinmarketcap.com/";
+
+
+
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'views'));
 app.use(express.static('public'));
+
 const sessionConfig = {
-    secret : 'mysecret',
+    secret : process.env.SESSION_SECRET,
     resave : false,
     saveUninitialized : false,
     cookie : {
         maxAge : 1000 * 60 * 60 *24 ,
-    }
-    
+    },
+    store : mongoSessionStore.create({ client : mongoClient})
 }
+
 app.use(session(sessionConfig));
 
 
@@ -65,10 +81,8 @@ app.get('/summary',async (req,res)=>{
         req.session.currencyIDs = ids;
         const {data : metadata} = await axios.get(metaURL,config);
         req.session.currencyMetadata = metadata["data"];
-        console.log('a',req.session.currencyIDs,ids);
         req.session.count = 1;
     }else{
-        console.log('b',req.session.currencyIDs,ids);
         req.session.count ++;
     }
         
@@ -84,7 +98,6 @@ app.get('/summary',async (req,res)=>{
         ret.volume =  Number.parseFloat(currency["quote"]["2781"]["volume_24h"]).toFixed(2);;
         return ret;
     })
-    // console.log(currencies);
     console.log(req.session.count);
     res.render('summary',{currencies});
 })
