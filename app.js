@@ -4,24 +4,27 @@ const path = require('path');
 const axios = require('axios');
 const { application } = require('express');
 require('dotenv').config();
+const session = require('express-session');
 
 const port = 3000;
 const baseURL = "https://pro-api.coinmarketcap.com/";
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'views'));
 app.use(express.static('public'));
+const sessionConfig = {
+    secret : 'mysecret',
+    resave : false,
+    saveUninitialized : false,
+    cookie : {
+        maxAge : 1000 * 60 * 60 *24 ,
+    }
+    
+}
+app.use(session(sessionConfig));
+
 
 app.listen(port, ()=>{
     console.log(`Listening on port ${port}`);
-})
-
-app.get('/test',async (req,res)=>{
-    const id = Math.floor(Math.random()*82)+1;
-    const url_test = `https://swapi.dev/api/people/${id}/`;
-    const config = {headers : {Accept : 'application/json'}};
-    const {data} = await axios.get(url_test,config);
-    console.log(process.env.CMC_API_KEY);
-    res.render('home',{data});
 })
 
 app.get('/sandbox',async (req,res)=>{
@@ -58,12 +61,21 @@ app.get('/summary',async (req,res)=>{
     const {data : quoteData} = await axios.get(quoteURL, config);
     const ids = quoteData["data"].map( currency => currency.id);
     const metaURL = `${baseURL}v2/cryptocurrency/info?id=${ids.join()}`;
-    const {data : metadata} = await axios.get(metaURL,config);
-    
+    if(JSON.stringify(req.session.currencyIDs) !== JSON.stringify(ids)){
+        req.session.currencyIDs = ids;
+        const {data : metadata} = await axios.get(metaURL,config);
+        req.session.currencyMetadata = metadata["data"];
+        console.log('a',req.session.currencyIDs,ids);
+        req.session.count = 1;
+    }else{
+        console.log('b',req.session.currencyIDs,ids);
+        req.session.count ++;
+    }
+        
     const currencies = quoteData["data"].map(currency =>{
         const ret = {};
         ret.id = currency.id;
-        ret.logo = metadata["data"][`${currency.id}`]["logo"];
+        ret.logo = req.session.currencyMetadata[`${currency.id}`]["logo"];
         ret.name = currency["name"];
         ret.symbol = currency["symbol"];
         ret.price = Number.parseFloat(currency["quote"]["2781"]["price"]).toFixed(2);
@@ -73,6 +85,7 @@ app.get('/summary',async (req,res)=>{
         return ret;
     })
     // console.log(currencies);
+    console.log(req.session.count);
     res.render('summary',{currencies});
 })
 
