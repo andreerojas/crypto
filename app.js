@@ -7,6 +7,10 @@ require('dotenv').config();
 const session = require('express-session');
 const mongoose = require('mongoose');
 const mongoSessionStore = require('connect-mongo');
+const User = require('./models/user');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const ejsMate = require('ejs-mate');
 
 mongoose.connect('mongodb://127.0.0.1:27017/crypto')
     .then(()=>{
@@ -15,13 +19,14 @@ mongoose.connect('mongodb://127.0.0.1:27017/crypto')
     .catch(e =>{
         console.log("ERROR CONNECTING TO DATABASE");        
     });
-const mongoClient = mongoose.connection.getClient();
+
+    const mongoClient = mongoose.connection.getClient();
 
 const port = 3000;
 const baseURL = "https://pro-api.coinmarketcap.com/";
 
 
-
+app.engine('ejs',ejsMate);
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'views'));
 app.use(express.static('public'));
@@ -38,6 +43,12 @@ const sessionConfig = {
 
 app.use(session(sessionConfig));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.listen(port, ()=>{
     console.log(`Listening on port ${port}`);
@@ -79,8 +90,11 @@ app.get('/summary',async (req,res)=>{
     const metaURL = `${baseURL}v2/cryptocurrency/info?id=${ids.join()}`;
     if(JSON.stringify(req.session.currencyIDs) !== JSON.stringify(ids)){
         req.session.currencyIDs = ids;
+        req.session.currencyMetadata = {};
         const {data : metadata} = await axios.get(metaURL,config);
-        req.session.currencyMetadata = metadata["data"];
+        for(let [key,value] of Object.entries(metadata["data"])){
+            req.session.currencyMetadata[`${key}`] = value['logo'];
+        }
         req.session.count = 1;
     }else{
         req.session.count ++;
@@ -89,7 +103,7 @@ app.get('/summary',async (req,res)=>{
     const currencies = quoteData["data"].map(currency =>{
         const ret = {};
         ret.id = currency.id;
-        ret.logo = req.session.currencyMetadata[`${currency.id}`]["logo"];
+        ret.logo = req.session.currencyMetadata[`${currency.id}`];
         ret.name = currency["name"];
         ret.symbol = currency["symbol"];
         ret.price = Number.parseFloat(currency["quote"]["2781"]["price"]).toFixed(2);
@@ -102,3 +116,26 @@ app.get('/summary',async (req,res)=>{
     res.render('summary',{currencies});
 })
 
+app.get('/register',(req,res)=>{
+    res.render('register');
+})
+
+app.post('/register', async(req,res)=>{
+    res.send('register test')
+})
+
+app.get('/login',(req,res)=>{
+    res.render('login');
+})
+
+app.post('/login', passport.authenticate('local',{failureFlash : true , failureRedirect : '/login'}),(req,res)=>{
+    res.redirect('/');
+})
+
+app.get('/test',(req,res)=>{
+    res.render('test');
+})
+
+app.get('/test2',(req,res)=>{
+    res.render('test2');
+})

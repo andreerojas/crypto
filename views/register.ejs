@@ -1,0 +1,38 @@
+<% layout('boilerplate') %>
+<div class="container my-5">
+    <div class="row">
+        <form class="col-6 offset-3 form-validation"  action="/register" method="post" novalidate>
+            <div class="mb-3">
+              <label for="firstName" class="form-label">First name</label>
+              <input type="text" class="form-control" id="firstName" required>
+              <div class="invalid-feedback">
+                Please insert your first name.
+              </div>
+            </div>
+            <div class="mb-3">
+                <label for="lastName" class="form-label">Last name</label>
+                <input type="text" class="form-control" id="lastName" required>
+                <div class="invalid-feedback">
+                    Please insert your last name.
+                  </div>
+            </div>
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" required>
+                <div class="invalid-feedback">
+                    Please insert your username.
+                  </div>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <input type="password" class="form-control" id="password" required>
+              <div class="invalid-feedback">
+                Please insert your password.
+              </div>
+            </div>
+        
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form> 
+    </div>
+</div>
+<% block('body').append('<script src="js/formValidation.js"></script>') %>
