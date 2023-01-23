@@ -10,36 +10,12 @@
     <title>CryptoBay</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-light">
-        <div class="container-fluid">
-          <a class="navbar-brand active" href="/home">CryptoBay</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#cryptoBayLinks" aria-controls="cryptoBayLinks" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="cryptoBayLinks">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <li class="nav-item">
-                <a class="nav-link" href="/summary">All currencies</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/personal">My wallet</a>
-              </li>
-            </ul>
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/register">Register</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/login">Login</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="/logout">Logout</a>
-                  </li>
-            </ul>            
-          </div>
-        </div>
-    </nav>
-    <%- body -%>
+  
+    <%- include('partials/navbar') %>
+    <main>
+      <%- include('partials/flashMessages')%>
+      <%- body -%>
+    </main>
     <%- block('body').toString() %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"

@@ -1,3 +1,4 @@
 node_modules
 .env
 cmc_api_firstcall.txt
+mongoScripts
