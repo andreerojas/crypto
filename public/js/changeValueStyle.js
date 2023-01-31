@@ -1,7 +1,6 @@
+// stylying the arrow next to the change24h value
 const changeContainers = document.querySelectorAll('.change-container');
-
 for(let container of changeContainers){
-    // console.log("val is: ",container.lastChild);
     const changeValue = container.lastChild.innerText.slice(0,-1);
     const negArrow = document.querySelector(`#${container.id}.change-container .bi-caret-down-fill`);
     const posArrow = document.querySelector(`#${container.id}.change-container .bi-caret-up-fill`);
@@ -25,3 +24,39 @@ for(let container of changeContainers){
         container.classList.remove('positiveChange');
     }
 }
+
+//stylying the hearts corresponding to the favorites functionality
+const heartContainers = document.querySelectorAll('.heart-container');
+for(let heartContainer of heartContainers){
+    const checkbox = heartContainer.children[0];
+    checkbox.addEventListener('change',async (e)=>{
+        console.log('change event');
+        const action = checkbox.checked ? 'add' : 'remove';
+        try{
+            const response = await axios.post('/favorites',{
+                'name' : checkbox.value,
+                'action' : action
+            })
+            const alertMsg = `You ${(response.data.msg)==="add"? "added" : "removed"} this coin to your favorite list succesfully`; 
+            createAlert("alert-holder", alertMsg, 'success');
+        }catch(e){
+            console.log('error is: ',e)
+        }
+    })
+}
+
+// stylying the flash messages
+const createAlert = (holderId, message, type )=>{
+    const alertPlaceholder = document.getElementById(holderId);
+    const wrapper = document.createElement('div')
+    wrapper.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+    alertPlaceholder.append(wrapper);
+}
+
+
+// styles to order the currencies data
+const rowsContainer = document.querySelector('#dataRows');
+const sortingFn = (a,b)=>{
+    return a.id.match(/\d+/) - b.id.match(/\d+/)
+}
+rowsContainer.replaceChildren(... Array.from(rowsContainer.children).sort(sortingFn))

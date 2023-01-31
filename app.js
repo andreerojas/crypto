@@ -2,34 +2,34 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const axios = require('axios');
-const { application } = require('express');
 require('dotenv').config();
 const session = require('express-session');
 const mongoose = require('mongoose');
 const mongoSessionStore = require('connect-mongo');
 const User = require('./models/user');
+const Currency = require('./models/currency')
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const ejsMate = require('ejs-mate');
 const AppError = require('./utilities/AppError');
 const wrapAsync = require('./utilities/wrapAsync');
 const {userValidationSchema, validateUser} = require('./utilities/validationSchema');
-const { wrap } = require('module');
 const flash = require('connect-flash');
+const {updatePrices, fiatSymbol} = require('./utilities/updatePrices')
+const port = 3000;
+const updatePricesPeriod = 10 * 60 * 1000; // 10 minutes
+const {isLoggedIn} = require('./utilities/authMiddleware');
 
 mongoose.connect('mongodb://127.0.0.1:27017/crypto')
 .then(()=>{
     console.log("CONNECTED TO DATABASE");
+    const id = setInterval( updatePrices, updatePricesPeriod);
 })
 .catch(e =>{
-    console.log("ERROR CONNECTING TO DATABASE");        
+    console.log("ERROR CONNECTING TO DATABASE");
+    console.error(e);        
 });
-
-
 const mongoClient = mongoose.connection.getClient();
-const port = 3000;
-const baseURL = "https://pro-api.coinmarketcap.com/";
-
 
 app.engine('ejs',ejsMate);
 app.set('view engine','ejs');
@@ -49,10 +49,6 @@ const sessionConfig = {
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(session(sessionConfig));
-
-
-
-
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
@@ -64,46 +60,17 @@ app.use((req,res,next)=>{
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     res.locals.user = req.user;
+    // console.log('req.user is: ',req.user.favorites[0]);
+    res.locals.fiatSymbol = fiatSymbol;
     next();
 })
 
-app.get('/home',(req,res)=>{
-    console.log(req.user);
+app.get('/home',async (req,res)=>{
     res.render('home');
 })
+
 app.get('/summary',wrapAsync(async (req,res)=>{
-    const quoteURL =   baseURL + "v1/cryptocurrency/listings/latest?start=1&limit=5&convert_id=2781";
-    const config = {headers : { 'X-CMC_PRO_API_KEY': process.env.CMC_API_KEY,
-    'Accept': 'application/json',
-    'Accept-Encoding' : 'deflate,gzip'}};
-    const {data : quoteData} = await axios.get(quoteURL, config);
-    const ids = quoteData["data"].map( currency => currency.id);
-    const metaURL = `${baseURL}v2/cryptocurrency/info?id=${ids.join()}`;
-    if(JSON.stringify(req.session.currencyIDs) !== JSON.stringify(ids)){
-        req.session.currencyIDs = ids;
-        req.session.currencyMetadata = {};
-        const {data : metadata} = await axios.get(metaURL,config);
-        for(let [key,value] of Object.entries(metadata["data"])){
-            req.session.currencyMetadata[`${key}`] = value['logo'];
-        }
-        req.session.count = 1;
-    }else{
-        req.session.count ++;
-    }
-    
-    const currencies = quoteData["data"].map(currency =>{
-        const ret = {};
-        ret.id = currency.id;
-        ret.logo = req.session.currencyMetadata[`${currency.id}`];
-        ret.name = currency["name"];
-        ret.symbol = currency["symbol"];
-        ret.price = Number.parseFloat(currency["quote"]["2781"]["price"]).toFixed(2);
-        ret.change24h = Number.parseFloat(currency["quote"]["2781"]["percent_change_24h"]).toFixed(2);
-        ret.marketCap = Number.parseFloat(currency["quote"]["2781"]["market_cap"]).toFixed(2);
-        ret.volume =  Number.parseFloat(currency["quote"]["2781"]["volume_24h"]).toFixed(2);;
-        return ret;
-    })
-    console.log(req.session.count);
+    const currencies = await Currency.find({});
     res.render('summary',{currencies});
 }))
 
@@ -112,12 +79,16 @@ app.get('/register',(req,res)=>{
 })
 
 app.post('/register', validateUser ,wrapAsync(async(req,res)=>{
-    const {user} = req.body;
-    const newUser = new User(user);
-    User.register(newUser,user.password);
-    await newUser.save();
+    const {firstName, lastName, age, email, username, password} = req.body.user;
+    const newUser = new User({firstName, lastName, age, email, username});
+    const registeredUser = await User.register(newUser,password);
+    req.login(registeredUser,err =>{
+        if(err){
+            return next(err);
+        }
     req.flash('success','User registered succesfully');
-    res.redirect(`/wallet/${newUser._id}`);
+    res.redirect(`/wallet/${newUser._id}`); 
+    })
 }))
 
 app.get('/login',(req,res)=>{
@@ -125,19 +96,20 @@ app.get('/login',(req,res)=>{
 })
 
 app.post('/login', passport.authenticate('local',{failureFlash : true , failureRedirect : '/login'}),(req,res)=>{
+    const redirectUrl = req.session.returnTo || `/wallet/${req.user._id}`;
+    delete req.session.returnTo;
     req.flash('success','Welcome back!');
-    console.log('user is: ',req.user);
-    res.redirect(`/wallet/${req.user._id}`);
+    res.redirect(redirectUrl);
 })
 
-app.get('/wallet/:id',wrapAsync(async (req,res)=>{
+app.get('/wallet/:id', isLoggedIn, wrapAsync(async (req,res)=>{
     const {id}= req.params;
     const user = await User.findById(id);
     res.render(`wallet`,{user});
 }))
 
 
-app.get('/logout', (req,res)=>{
+app.get('/logout', isLoggedIn, (req,res)=>{
     req.logout(err =>{
         if(err){
             return next(err);
@@ -146,6 +118,26 @@ app.get('/logout', (req,res)=>{
         res.redirect('/home')
     })
 });
+
+app.post('/favorites', isLoggedIn, wrapAsync(async (req,res)=>{
+    const user = await User.findById(req.user._id);
+    const {name : currencyName, action} = req.body;
+    let msg = '';
+
+    const currency = await Currency.findOne({'name' : currencyName});
+    if(action === 'add'){
+        console.log('id: ',currency)
+        user.favorites.push(currency._id);
+        await user.save();
+    }else if(action === 'remove'){
+        const idx = user.favorites.indexOf(currency);
+        user.favorites.splice(idx,1);
+        await user.save();
+    }else{
+        next();
+    }
+    res.json({msg:action})
+}))
 
 app.all("*",(req,res,next)=>{
     next(new AppError("page not found",404));
@@ -160,3 +152,6 @@ app.use((err,req,res,next)=>{
 app.listen(port, ()=>{
     console.log(`Listening on port ${port}`);
 })
+
+
+
