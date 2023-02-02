@@ -19,6 +19,7 @@ const {updatePrices, fiatSymbol} = require('./utilities/updatePrices')
 const port = 3000;
 const updatePricesPeriod = 10 * 60 * 1000; // 10 minutes
 const {isLoggedIn} = require('./utilities/authMiddleware');
+const { findByIdAndUpdate } = require('./models/currency');
 
 mongoose.connect('mongodb://127.0.0.1:27017/crypto')
 .then(()=>{
@@ -60,7 +61,6 @@ app.use((req,res,next)=>{
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     res.locals.user = req.user;
-    // console.log('req.user is: ',req.user.favorites[0]);
     res.locals.fiatSymbol = fiatSymbol;
     next();
 })
@@ -102,12 +102,9 @@ app.post('/login', passport.authenticate('local',{failureFlash : true , failureR
     res.redirect(redirectUrl);
 })
 
-app.get('/wallet/:id', isLoggedIn, wrapAsync(async (req,res)=>{
-    const {id}= req.params;
-    const user = await User.findById(id);
-    res.render(`wallet`,{user});
-}))
-
+app.get('/wallet/', isLoggedIn, (req,res)=>{ 
+    res.render(`wallet`);
+})
 
 app.get('/logout', isLoggedIn, (req,res)=>{
     req.logout(err =>{
@@ -126,17 +123,31 @@ app.post('/favorites', isLoggedIn, wrapAsync(async (req,res)=>{
 
     const currency = await Currency.findOne({'name' : currencyName});
     if(action === 'add'){
-        console.log('id: ',currency)
-        user.favorites.push(currency._id);
-        await user.save();
+        await User.findByIdAndUpdate(req.user._id,{$push : {'favorites' : currency._id}})
     }else if(action === 'remove'){
-        const idx = user.favorites.indexOf(currency);
-        user.favorites.splice(idx,1);
-        await user.save();
+        await User.findByIdAndUpdate(req.user._id, {$pull : {'favorites' : currency._id}})
     }else{
-        next();
+        throw new AppError('Request to modify user favorite currencies is not allowed',404);
     }
     res.json({msg:action})
+}))
+
+app.get('/deposit', isLoggedIn, wrapAsync(async(req,res)=>{
+    const rawCurrencies = await Currency.find();
+    const currencies = rawCurrencies.map( currency => { 
+        const {API_id, name, symbol, logo, price} = currency;
+        return {API_id, name, symbol, logo, price};
+    });
+    res.render('deposit', {currencies});
+}))
+
+app.post('/deposit', isLoggedIn, wrapAsync(async (req,res)=>{
+    const {selectedCoinID, amount} = req.body
+    const coin = await Currency.findOne({'API_id' : selectedCoinID});
+    const addedCoin = {'currency' : coin._id , 'qty' : amount};
+    await User.findByIdAndUpdate(req.user._id, 
+                            {$push : {'wallet' : addedCoin}})
+    res.redirect('/wallet')
 }))
 
 app.all("*",(req,res,next)=>{

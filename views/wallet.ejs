@@ -1,7 +1,30 @@
 <% layout('boilerplate') %>
 <div class="container">
-    <p><%=user.firstName%></p>
-    <p><%=user.lastName %></p>
-    <p><%=user.age%></p>
-    <p><%=user.email %></p>
+    <div class="row">
+        <div class="col">
+            <h2>My personal info</h2>
+            <p><%=user.firstName%></p>
+            <p><%=user.lastName %></p>
+            <p><%=user.age%></p>
+            <p><%=user.email %></p>
+        </div>
+        <div class="col">
+            <h2>My favorites</h2>
+            <ul>
+                <%for(let favorite of user.favorites){%>
+                    <li><%= favorite['name'] %></li>
+                <%}%>
+            </ul>
+            
+        </div>
+        <div class="col">
+            <h2>My wallet</h2>
+            <ul>
+                <%for(let coin of user.wallet){%>
+                    <li><%= `You have ${coin.currency.price * coin.qty}  euros in your wallet` %></li>
+                <%}%>
+            </ul>
+        </div>
+    </div>
+    
 </div>

@@ -57,3 +57,10 @@
 .heart-hidden{
     display: none;
 }
+
+.crypto-alerts{
+    position: fixed;
+    top: 0;
+    left: 40%;
+}
+

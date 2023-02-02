@@ -21,8 +21,13 @@ const userSchema = new Schema({
         required : true
     },
     wallet : [{
-        type : {'currency' : Schema.Types.ObjectId, 'qty' : Number},
-        ref  : 'Currency' 
+        type : {
+            'currency' : {
+                    type : Schema.Types.ObjectId,
+                    ref  : 'Currency' 
+            },
+            'qty' : Number
+        }
     }],
     favorites : [{
         type : Schema.Types.ObjectId,
@@ -31,8 +36,19 @@ const userSchema = new Schema({
 })
 
 mongoose.set('strictQuery', true);
-userSchema.plugin(passportLocalMongoose);
-
+userSchema.plugin(passportLocalMongoose, {
+    populateFields : [{ 
+            path : 'wallet',
+            populate : {
+                path : 'currency',
+                select : 'price'
+                }
+            },
+            {
+                path    :   'favorites',
+                select  :   ['API_id','name','logo']
+            }]
+});
 const User = mongoose.model('User',userSchema);
 module.exports =  User;
 

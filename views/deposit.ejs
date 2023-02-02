@@ -1,0 +1,35 @@
+<% layout('boilerplate') %>
+<% block('head').append('<link rel="stylesheet" href="css/depositStyles.css">') %>
+<div class="container my-5">
+    <div class="row">
+        <form class="col-6 offset-3 form-validation d-flex flex-column"  action="/deposit" method="post" novalidate>
+            <div class="text-center mb-5">
+                <h1>Deposit</h1>                
+            </div>
+            <div class="fw-semibold mb-3">
+                <label for="coins" class="form-label">Select a coin</label>
+                <select class="form-select" id="coins" aria-label="Coins selection" required name="selectedCoinID">
+                    <%for(let currency of currencies){%>
+                        <option value="<%= currency['API_id']%>"><%= currency.name %></option>
+                    <%}%>
+                </select>
+            </div>
+            <div class="fw-semibold mb-3">
+              <label for="amount" class="form-label">Amount</label>
+              <input type="text" class="form-control" id="amount" name="amount" required pattern="\d+(.\d+)?">
+              <div class="invalid-feedback">Enter a valid number</div>
+            </div>
+            <div class="mb-3 fw-semibold equivalent-container hide d-flex flex-row justify-content-between">Equivalent: <span><span id="equivalent"></span> <%= fiatSymbol %></span></div>
+            <div class="mt-3 d-flex justify-content-around">
+                <a href="summary" class="btn btn-primary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Deposit</button>
+            </div>
+            
+        </form> 
+    </div>
+</div>
+<script>
+    const currencies = <%- JSON.stringify(currencies)%>
+</script>
+<% block('body').append('<script src="js/deposit.js"></script>') %>
+<% block('body').append('<script src="js/formValidation.js"></script>') %>

@@ -1,7 +1,7 @@
 // stylying the arrow next to the change24h value
 const changeContainers = document.querySelectorAll('.change-container');
 for(let container of changeContainers){
-    const changeValue = container.lastChild.innerText.slice(0,-1);
+    const changeValue = container.children[2].innerText.slice(0,-1);
     const negArrow = document.querySelector(`#${container.id}.change-container .bi-caret-down-fill`);
     const posArrow = document.querySelector(`#${container.id}.change-container .bi-caret-up-fill`);
     if(changeValue>0){
@@ -29,10 +29,15 @@ for(let container of changeContainers){
 const heartContainers = document.querySelectorAll('.heart-container');
 for(let heartContainer of heartContainers){
     const checkbox = heartContainer.children[0];
+    checkbox.checked = userFavs.includes(checkbox.id.match(/\d+/)[0]);
     checkbox.addEventListener('change',async (e)=>{
         console.log('change event');
         const action = checkbox.checked ? 'add' : 'remove';
         try{
+            console.log('fav request is: ',{
+                'name' : checkbox.value,
+                'action' : action
+            })
             const response = await axios.post('/favorites',{
                 'name' : checkbox.value,
                 'action' : action
@@ -49,7 +54,7 @@ for(let heartContainer of heartContainers){
 const createAlert = (holderId, message, type )=>{
     const alertPlaceholder = document.getElementById(holderId);
     const wrapper = document.createElement('div')
-    wrapper.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
+    wrapper.innerHTML = '<div class="alert alert-' + type + ' alert-dismissible crypto-alerts" role="alert">' + message + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>'
     alertPlaceholder.append(wrapper);
 }
 
@@ -59,4 +64,6 @@ const rowsContainer = document.querySelector('#dataRows');
 const sortingFn = (a,b)=>{
     return a.id.match(/\d+/) - b.id.match(/\d+/)
 }
-rowsContainer.replaceChildren(... Array.from(rowsContainer.children).sort(sortingFn))
+if(rowsContainer){
+    rowsContainer.replaceChildren(... Array.from(rowsContainer.children).sort(sortingFn))
+}
