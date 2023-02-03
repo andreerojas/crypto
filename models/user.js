@@ -41,7 +41,7 @@ userSchema.plugin(passportLocalMongoose, {
             path : 'wallet',
             populate : {
                 path : 'currency',
-                select : 'price'
+                select : ['price','name','logo','API_id']
                 }
             },
             {

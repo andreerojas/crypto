@@ -21,7 +21,7 @@
             <h2>My wallet</h2>
             <ul>
                 <%for(let coin of user.wallet){%>
-                    <li><%= `You have ${coin.currency.price * coin.qty}  euros in your wallet` %></li>
+                    <li><%= `You have ${coin.qty} ${coin.currency.name} in your wallet` %></li>
                 <%}%>
             </ul>
         </div>

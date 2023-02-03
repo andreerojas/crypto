@@ -18,7 +18,7 @@ const flash = require('connect-flash');
 const {updatePrices, fiatSymbol} = require('./utilities/updatePrices')
 const port = 3000;
 const updatePricesPeriod = 10 * 60 * 1000; // 10 minutes
-const {isLoggedIn} = require('./utilities/authMiddleware');
+const {isLoggedIn, checkReturnTo} = require('./utilities/middleware');
 const { findByIdAndUpdate } = require('./models/currency');
 
 mongoose.connect('mongodb://127.0.0.1:27017/crypto')
@@ -95,22 +95,20 @@ app.get('/login',(req,res)=>{
     res.render('login');
 })
 
-app.post('/login', passport.authenticate('local',{failureFlash : true , failureRedirect : '/login'}),(req,res)=>{
-    const redirectUrl = req.session.returnTo || `/wallet/${req.user._id}`;
-    delete req.session.returnTo;
+app.post('/login', checkReturnTo, passport.authenticate('local',{failureFlash : true , failureRedirect : '/login'}),(req,res)=>{
+    const redirectUrl = res.locals.returnTo || `/wallet`;
+    console.log('after login', res.locals.returnTo)
     req.flash('success','Welcome back!');
     res.redirect(redirectUrl);
 })
 
-app.get('/wallet/', isLoggedIn, (req,res)=>{ 
+app.get('/wallet/', isLoggedIn, (req,res)=>{
     res.render(`wallet`);
 })
 
 app.get('/logout', isLoggedIn, (req,res)=>{
     req.logout(err =>{
-        if(err){
-            return next(err);
-        }
+        if(err){ return next(err); }
         req.flash('success','good bye!')
         res.redirect('/home')
     })
@@ -133,21 +131,29 @@ app.post('/favorites', isLoggedIn, wrapAsync(async (req,res)=>{
 }))
 
 app.get('/deposit', isLoggedIn, wrapAsync(async(req,res)=>{
-    const rawCurrencies = await Currency.find();
-    const currencies = rawCurrencies.map( currency => { 
-        const {API_id, name, symbol, logo, price} = currency;
-        return {API_id, name, symbol, logo, price};
-    });
+    const currencies = await Currency.find({},['API_id','name','symbol','logo','price']);
     res.render('deposit', {currencies});
 }))
 
 app.post('/deposit', isLoggedIn, wrapAsync(async (req,res)=>{
     const {selectedCoinID, amount} = req.body
     const coin = await Currency.findOne({'API_id' : selectedCoinID});
-    const addedCoin = {'currency' : coin._id , 'qty' : amount};
-    await User.findByIdAndUpdate(req.user._id, 
-                            {$push : {'wallet' : addedCoin}})
+    const foundUser = await User.findOne({'_id' : req.user._id , 'wallet.currency' : coin._id});
+    if(foundUser){
+        await User.findOneAndUpdate( {'_id' : req.user._id , 'wallet.currency' : coin._id},{$inc : { 'wallet.$.qty' : amount}});
+    }else{
+        const addedCoin = {'currency' : coin._id , 'qty' : amount};
+        await User.findByIdAndUpdate(req.user._id, {$push : {'wallet' : addedCoin}});
+    }
     res.redirect('/wallet')
+}))
+
+app.get('/withdraw', isLoggedIn, wrapAsync(async (req,res)=>{
+    res.render('withdraw');
+}))
+
+app.post('/withdraw',isLoggedIn, wrapAsync(async (req,res)=>{
+    res.send(req.body);
 }))
 
 app.all("*",(req,res,next)=>{
@@ -156,7 +162,7 @@ app.all("*",(req,res,next)=>{
 
 app.use((err,req,res,next)=>{
     if(!err.message) err.message = 'unknown error';
-    if(!err.status) err.status = 405,
+    if(!err.status) err.status = 405;
     res.status(err.status).send(`error is: ${err.message}`);
 })
 

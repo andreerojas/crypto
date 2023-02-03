@@ -1,16 +1,16 @@
 <% layout('boilerplate') %>
-<% block('head').append('<link rel="stylesheet" href="css/depositStyles.css">') %>
+<% block('head').append('<link rel="stylesheet" href="css/withdrawStyles.css">') %>
 <div class="container my-5">
     <div class="row">
-        <form class="col-6 offset-3 form-validation d-flex flex-column"  action="/deposit" method="post" novalidate>
+        <form class="col-6 form-validation d-flex flex-column"  action="/withdraw" method="post" novalidate>
             <div class="text-center mb-5">
-                <h1>Deposit</h1>                
+                <h1>Withdraw</h1>                
             </div>
             <div class="fw-semibold mb-3">
                 <label for="coins" class="form-label">Select a coin</label>
                 <select class="form-select" id="coins" aria-label="Coins selection" required name="selectedCoinID">
-                    <%for(let currency of currencies){%>
-                        <option value="<%= currency['API_id']%>"><%= currency.name %></option>
+                    <%for(let asset of user.wallet){%>
+                        <option value="<%= asset.currency.API_id%>"><%= asset.currency.name %></option>
                     <%}%>
                 </select>
             </div>
@@ -25,11 +25,19 @@
                 <button type="submit" class="btn btn-primary">Deposit</button>
             </div>
             
-        </form> 
+        </form>
+        <div class="col-6 d-flex flex-column align-items-center">
+            <h2 class="mb-5">My wallet</h2>
+            <ul>
+                <%for(let coin of user.wallet){%>
+                    <li><%= `You have ${coin.qty} ${coin.currency.name} in your wallet` %></li>
+                <%}%>
+            </ul>
+        </div>
     </div>
 </div>
 <script>
-    const currencies = <%- JSON.stringify(currencies)%>
+    const userWallet = <%- JSON.stringify(user.wallet) %>;
 </script>
-<% block('body').append('<script src="js/deposit.js"></script>') %>
+<% block('body').append('<script src="js/withdraw.js"></script>') %>
 <% block('body').append('<script src="js/formValidation.js"></script>') %>
