@@ -1,5 +1,13 @@
 <% layout('boilerplate') %>
 <% block('head').append('<link rel="stylesheet" href="css/landingStyles.css">') %>
-<div class="container-fluid landing-container">
-    <h1>Welcome to CryptoBay</h1>
+<div class="container-fluid px-5 d-flex h-75">
+    <div class="row align-items-center justify-content-between flex-grow-1">
+        <div class="col col-lg-6 px-0 pe-lg-5 d-flex flex-column justify-content-center align-items-center">
+            <h1 class="text-center mb-5"><span id="verb-landing" class="me-3">Save</span>your crypto money, all in one app</h1>
+            <a href="/summary" class="btn btn-dark mt-5">Start</a>
+        </div>
+        <div class="d-none col-12 col-lg-6 px-0 ps-lg-5 d-lg-flex align-items-center">
+            <img class="d-inline-block w-100" src="img/landing-main.jpg" alt="Main image of landing site">
+        </div>
+    </div>
 </div>

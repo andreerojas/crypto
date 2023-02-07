@@ -12,12 +12,12 @@
     <title>CryptoBay</title>
 </head>
 <body>
-    <header class="container-lg">
+    <header>
         <%- include('partials/navbar') %>
+        <%- include('partials/flashMessages')%>
     </header>
     
-    <main>
-        <%- include('partials/flashMessages')%>
+    <main class="d-flex flex-column flex-md-row justify-content-center align-items-center">
         <%- body -%>
     </main>
     <footer class="text-light">

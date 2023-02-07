@@ -6,7 +6,6 @@ body{
     grid-template-rows: minmax(2rem,auto) 1fr minmax(2rem,auto);
 }
 
-footer{
+header, footer{
     background-color: #33405e;
-    /* color: #9596a7; */
 }
