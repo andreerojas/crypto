@@ -1,0 +1,13 @@
+<% layout('boilerplate') %>
+<div class="container">
+    <%for(let article of articles){%>
+        <div>
+            <h2><%= article.coinName %></h2>
+            <ul>
+                <%for(let coinArticle of article.coinArticles){%>
+                    <li><%= coinArticle.title %></li>
+                <%}%>
+            </ul>
+        </div>
+    <%}%>
+</div>

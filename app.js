@@ -16,15 +16,19 @@ const wrapAsync = require('./utilities/wrapAsync');
 const {userValidationSchema, validateUser} = require('./utilities/validationSchema');
 const flash = require('connect-flash');
 const {updatePrices, fiatSymbol} = require('./utilities/updatePrices')
+const {updateArticles} = require('./utilities/updateArticles');
+updateArticles
 const port = 3000;
-const updatePricesPeriod = 10 * 60 * 1000; // 10 minutes
+const updatePricesPeriod = 100 * 60 * 1000; // 10 minutes
+const updateArticlesPeriod = 24 * 60 * 60 * 1000; // 1day
 const {isLoggedIn, checkReturnTo} = require('./utilities/middleware');
-const { findByIdAndUpdate } = require('./models/currency');
+
 
 mongoose.connect('mongodb://127.0.0.1:27017/crypto')
 .then(()=>{
     console.log("CONNECTED TO DATABASE");
     const id = setInterval( updatePrices, updatePricesPeriod);
+    const id2 = setInterval( updateArticles, updateArticlesPeriod);
 })
 .catch(e =>{
     console.log("ERROR CONNECTING TO DATABASE");
@@ -65,7 +69,7 @@ app.use((req,res,next)=>{
     next();
 })
 
-app.get('/home',async (req,res)=>{
+app.get('/',async (req,res)=>{
     res.render('home');
 })
 
@@ -87,7 +91,7 @@ app.post('/register', validateUser ,wrapAsync(async(req,res)=>{
             return next(err);
         }
     req.flash('success','User registered succesfully');
-    res.redirect(`/wallet/${newUser._id}`); 
+    res.redirect(`/wallet`); 
     })
 }))
 
@@ -110,7 +114,7 @@ app.get('/logout', isLoggedIn, (req,res)=>{
     req.logout(err =>{
         if(err){ return next(err); }
         req.flash('success','good bye!')
-        res.redirect('/home')
+        res.redirect('/')
     })
 });
 
@@ -153,7 +157,31 @@ app.get('/withdraw', isLoggedIn, wrapAsync(async (req,res)=>{
 }))
 
 app.post('/withdraw',isLoggedIn, wrapAsync(async (req,res)=>{
-    res.send(req.body);
+    const {selectedCoinID, amount} = req.body;
+    const coin = await Currency.findOne({'API_id' : selectedCoinID});
+    const foundUser = await User.findOne({'_id' : req.user._id , 'wallet.currency' : coin._id, 'wallet.qty' : {$gte : amount}});
+    if(foundUser){
+        const dada = await User.findOneAndUpdate(   {'_id' : req.user._id , 'wallet.currency' : coin._id, 'wallet.qty' : {$gte : amount}},
+                                                    {$inc : { 'wallet.$.qty' : -amount}})
+        req.flash('success', 'withdraw was completed succesfully');
+    }else{
+        req.flash('error', 'an error occurred');
+    }
+    res.redirect('/wallet');
+}))
+
+app.get('/news', isLoggedIn ,wrapAsync(async (req,res)=>{
+    const favs = await Currency.find({'_id' :  {$in : req.user.favorites.map(f => f._id)}}).populate('articles');
+    const articles = [];
+    for(let fav of favs){
+        let aux = [];
+        for(let article of fav.articles){
+            const {title, description, url, urlToImage, author, publishedAt} = article;
+            aux.push({title, description, url, urlToImage, author, publishedAt});
+        }
+        articles.push({'coinName' : fav.name, 'coinArticles' : aux})
+    }
+    res.render('news',{articles});
 }))
 
 app.all("*",(req,res,next)=>{

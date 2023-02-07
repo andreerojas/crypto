@@ -5,14 +5,13 @@ const select = document.querySelector('#coins');
 const amountFeedback = document.querySelector('#amount + .invalid-feedback')
 const form = document.querySelector('form');
 
-
-amount.addEventListener('input',()=>{
+const inputsValidation = ()=>{
     form.classList.add('was-validated');
     amount.setCustomValidity('');
     amountFeedback.innerText = 'Enter a valid number';
     const asset = userWallet.find( asset  => asset.currency['API_id'] === Number.parseInt(select.value));
-    if(!amount.validity.patternMismatch && asset){
-        
+    console.log('here')
+    if(!amount.validity.patternMismatch && !amount.validity.valueMissing &&  asset){   
         if(amount.value > asset.qty){
             amount.setCustomValidity('Funds are not available');
             amountFeedback.innerText = 'Funds are not available';
@@ -22,20 +21,10 @@ amount.addEventListener('input',()=>{
         }
         
     }else{
+        console.log('hideeee')
         equivalentContainer.classList.add('hide');
     }
-})
+};
 
-// const calculateAmount = ()=>{
-//     const asset = userWallet.find( asset  => asset.currency['API_id'] === Number.parseInt(select.value));
-//     if(!amount.validity.patternMismatch && asset){
-//         equivalentContainer.classList.remove('hide');
-//         equivalent.innerText = (currency['price']*amount.value).toFixed(2);
-//     }else{
-//         equivalentContainer.classList.add('hide');
-//     }
-// }
-
-// amount.addEventListener('input',calculateAmount);
-// select.addEventListener('input',calculateAmount);
-// calculateAmount();
+amount.addEventListener('input',inputsValidation);
+select.addEventListener('input',inputsValidation);

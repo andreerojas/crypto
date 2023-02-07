@@ -16,13 +16,13 @@
             </div>
             <div class="fw-semibold mb-3">
               <label for="amount" class="form-label">Amount</label>
-              <input type="text" class="form-control" id="amount" name="amount" required pattern="\d+(.\d{1,5})?">
+              <input type="text" class="form-control" id="amount" name="amount" required pattern="^\d+(\.\d{1,5})?$">
               <div class="invalid-feedback">Enter a valid number</div>
             </div>
             <div class="mb-3 fw-semibold equivalent-container hide d-flex flex-row justify-content-between">Equivalent: <span><span id="equivalent"></span> <%= fiatSymbol %></span></div>
             <div class="mt-3 d-flex justify-content-around">
                 <a href="summary" class="btn btn-primary">Cancel</a>
-                <button type="submit" class="btn btn-primary">Deposit</button>
+                <button type="submit" class="btn btn-primary">Withdraw</button>
             </div>
             
         </form>

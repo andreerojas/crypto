@@ -3,6 +3,15 @@ const Schema = mongoose.Schema;
 const passportLocalMongoose = require('passport-local-mongoose');
 const Currency = require('./currency')
 
+const getQtyDecimals = (v)=>{
+    const value = Number.parseFloat(v).toFixed(5);
+    let ret = Number.parseFloat(value);
+    if(value * 10 === Number.parseInt(value*10)){
+        ret = Number.parseFloat(v).toFixed(2);
+    }
+    return ret;
+}
+
 const userSchema = new Schema({
     firstName : {
         type : String,
@@ -26,7 +35,11 @@ const userSchema = new Schema({
                     type : Schema.Types.ObjectId,
                     ref  : 'Currency' 
             },
-            'qty' : Number
+            'qty' : {
+                type    :  Schema.Types.Decimal128,
+                get     : getQtyDecimals,
+                set     : v => Number.parseFloat(v).toFixed(5)
+            }
         }
     }],
     favorites : [{

@@ -20,7 +20,7 @@ module.exports.updatePrices = async ()=>{
         const {price, percent_change_24h : change24h,  market_cap : marketCap,  volume_24h : volume} = quoteData['data'][idx]['quote'][fiat];
         await Currency.findOneAndUpdate({API_id : idx}, {price, change24h, marketCap, volume});
     }
-    console.log(new Date());
+    console.log('currencies information updated',new Date());
 }
 
 module.exports.fiatSymbol = fiatSymbols[fiat];

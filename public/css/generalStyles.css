@@ -1,0 +1,12 @@
+body{
+    margin: 0;
+    display: grid;
+    min-height: 100vh;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(2rem,auto) 1fr minmax(2rem,auto);
+}
+
+footer{
+    background-color: #33405e;
+    /* color: #9596a7; */
+}
