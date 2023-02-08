@@ -8,9 +8,11 @@ const icons = document.querySelectorAll('i');
 const headerRow = document.querySelector('#headerRow');
 const dataRows = document.querySelectorAll('#dataRows .row');
 const toggleOption = document.querySelector('#label-option-2 .options');
+const toggleContainer = document.querySelector('.color-mode');
+
 
 const toggleMultiple = (el, ...cls)=> cls.map( cl => el.classList.toggle(cl));
-function applyTheme() {    
+function applyTheme() {
     toggleMultiple(header, 'bg-light', 'text-dark');
     toggleMultiple(footer,'bg-light', 'text-dark');
     toggleMultiple(main,'dark','text-light');
@@ -22,6 +24,15 @@ function applyTheme() {
     if(dataRows) {dataRows.forEach(row => row.classList.toggle('border-secondary'))}
 }
 
-for (let option of themeOptions) {
-    option.addEventListener('input', applyTheme);
+function toggle(e){
+    e.preventDefault();
+    e.stopPropagation();
+    const unchecked = document.querySelector('input[type="radio"]:not(input[type="radio"]:checked)');
+    unchecked.checked = true;
+    applyTheme();
 }
+
+themeOptions.forEach(option => option.addEventListener('click',(e)=>{e.preventDefault()}));
+toggleContainer.addEventListener('click',toggle);
+
+
