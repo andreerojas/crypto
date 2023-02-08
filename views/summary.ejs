@@ -1,85 +1,73 @@
 <% layout('boilerplate') %>
 <% block('head').append('<link rel="stylesheet" href="css/summaryStyles.css">') %>
-<div class="container h-100">
-    <div class="row py-1 m-0 text-dark border-top border-bottom">
+<% block('head').append('<link rel="stylesheet" href="css/toggleColor.css">') %>
+<div class="container my-2 px-0">
+    <div class="row w-100 mx-0 my-2">
+        <div class=" fw-semibold col-8 d-inline-block">Today's cryptocurrency prices</div>
+        <div class="col-4 d-flex justify-content-end align-items-center">
+            <%- include('partials/toggleColor') %>
+        </div>
+    </div>
+    <div class="row py-1 m-0 border-top justify-content-between" id="headerRow">
         <div class="col-3 col-xxl-3 fw-bold">Name</div>
         <div class="col-3 col-xxl-2 fw-bold text-center">Price</div>
-        <div class="col-3 col-xxl-1 fw-bold text-center">24h%</div>
+        <div class="col-3 col-xxl-2 fw-bold text-center">24h%</div>
         <div class="col-0 col-xxl-2 fw-bold d-none d-xxl-flex justify-content-end">Market Cap</div>
         <div class="col-0 col-xxl-2  fw-bold d-none d-xxl-flex justify-content-end">Volume(24h)</div>
         <%if(user){%>
-        <div class="col-3 col-xxl-2 text-center">Favorites</div>
+        <div class="col-3 col-xxl-1 fw-bold text-center text-md-end">Favorites</div>
         <%}%>
-        <div class="container px-0" id="dataRows">
-            <%for(let currency of currencies){%>
-                <% const {logo, name, symbol, price, change24h, marketCap, volume, API_ranking, API_id}=currency%>
-                <div class="row py-3 border-bottom mx-0" id="rowContainer-<%=API_ranking %>">
-                    <div class="col-3 col-xxl-3"><img src="<%=logo%>" alt="" class="logo d-none d-md-inline-block">
-                        <span class="d-none d-xxl-inline-block">
-                            <%= name %>
-                        </span> <span class="text-muted">
-                            <%= symbol %>
-                        </span>
-                    </div>
-                    <div class="col-3 col-xxl-2 d-flex align-items-center justify-content-center justify-content-sm-center">
-                        <span class="fw-semibold me-1">
-                            <%= fiatSymbol %>
-                        </span>
-                        <%= price %>
-                    </div>
-                    <div class="col-3 col-xxl-1  text-end change-container p-0 d-flex justify-content-center align-items-center" id="cont-<%=API_ranking%>">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            class="bi bi-caret-down-fill arrow" viewBox="0 0 16 16">
-                            <path
-                                d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                            class="bi bi-caret-up-fill arrow" viewBox="0 0 16 16">
-                            <path
-                                d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z" />
-                        </svg>
-                        <span>
-                            <%= change24h %>%
-                        </span>
-                    </div>
-                    <div class="col-0 col-xxl-2 d-none d-xxl-flex align-items-center justify-content-end"><span
-                            class="fw-semibold me-1">
-                            <%= fiatSymbol %>
-                        </span>
-                        <%= marketCap %>
-                    </div>
-                    <div class="col-0 col-xxl-2 d-none d-xxl-flex align-items-center justify-content-end"><span
-                            class="fw-semibold me-1">
-                            <%= fiatSymbol %>
-                        </span>
-                        <%= volume %>
-                    </div>
-                    <%if(user){%>
-                    <div class="col-3 col-xxl-2 d-flex justify-content-center">
-                        <label class="heart-container" for="fav-<%= API_id %>">
-                            <input type="checkbox" name="name" value="<%= name %>" id="fav-<%=API_id%>">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-heart" viewBox="0 0 16 16">
-                                <path
-                                    d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                class="bi bi-heart-fill heart-hidden" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                    d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
-                            </svg>
-                        </label>
-                    </div>
-                    <%}%>
+    </div>
+    <div class="container px-0" id="dataRows">
+        <%for(let currency of currencies){%>
+            <% const {logo, name, symbol, price, change24h, marketCap, volume, API_ranking, API_id}=currency%>
+            <div class="row py-3 border-top mx-0 justify-content-between" id="rowContainer-<%=API_ranking %>">
+                <div class="col-3 col-xxl-3"><img src="<%=logo%>" alt="" class="logo d-none d-md-inline-block">
+                    <span class="d-none d-xxl-inline-block"><%= name %></span>
+                    <span class="text-muted"><%= symbol %></span>
                 </div>
-            <%}%>
-        </div>
+                <div class="col-3 col-xxl-2 d-flex align-items-center justify-content-center justify-content-sm-center">
+                    <span class="fw-semibold me-1"><%= fiatSymbol %></span>
+                    <%= price %>
+                </div>
+                <div class="col-3 col-xxl-2  text-end change-container p-0 d-flex justify-content-center align-items-center" id="cont-<%=API_ranking%>">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-caret-down-fill arrow" viewBox="0 0 16 16">
+                        <path
+                            d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-caret-up-fill arrow" viewBox="0 0 16 16">
+                        <path
+                            d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z" />
+                    </svg>
+                    <span><%= change24h %>%</span>
+                </div>
+                <div class="col-0 col-xxl-2 d-none d-xxl-flex align-items-center justify-content-end">
+                    <span class="fw-semibold me-1"><%= fiatSymbol %></span>
+                    <%= marketCap %>
+                </div>
+                <div class="col-0 col-xxl-2 d-none d-xxl-flex align-items-center justify-content-end">
+                    <span class="fw-semibold me-1"><%= fiatSymbol %></span>
+                    <%= volume %>
+                </div>
+                <%if(user){%>
+                <div class="col-3 col-xxl-1 d-flex justify-content-center justify-content-md-end">
+                    <label class="heart-container" for="fav-<%= API_id %>">
+                        <input type="checkbox" name="name" value="<%= name %>" id="fav-<%=API_id%>">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill heart-hidden" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" />
+                        </svg>
+                    </label>
+                </div>
+                <%}%>
+            </div>
+        <%}%>
     </div>
 </div>
-
-<script>
-    <%if (user) {%>
-        const userFavs = <%-JSON.stringify(user.favorites.map(currency => `${currency['API_id']}`)) %>;
-    <%}%>
-</script>
-<% block('body').append('<script src="js/changeValueStyle.js"></script>') %>
+<script><%if (user) {%>const userFavs = <%-JSON.stringify(user.favorites.map(currency => `${currency['API_id']}`)) %>;<%}%></script>
+<% block('body').append('<script src="js/toggleColorMode.js"></script>') %>
+<% block('body').append('<script src="js/summary.js"></script>') %>

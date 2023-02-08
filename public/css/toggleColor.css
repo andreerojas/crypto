@@ -1,0 +1,17 @@
+.color-mode{
+    width: 5rem;
+    height: 2rem;
+}
+.color-mode label,.options {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+input[type="radio"] + label .options{
+    border-radius: 50%;
+}
+
+input[type="radio"]:checked + label .options,
+main.dark{
+    background-color: #33405e;
+}

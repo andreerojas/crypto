@@ -19,7 +19,7 @@ const {updatePrices, fiatSymbol} = require('./utilities/updatePrices')
 const {updateArticles} = require('./utilities/updateArticles');
 updateArticles
 const port = 3000;
-const updatePricesPeriod = 120 * 60 * 1000; // 10 minutes
+const updatePricesPeriod = 24 * 60 * 60 * 1000; // 10 minutes
 const updateArticlesPeriod = 24 * 60 * 60 * 1000; // 1day
 const {isLoggedIn, checkReturnTo} = require('./utilities/middleware');
 
