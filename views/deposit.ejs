@@ -1,8 +1,9 @@
 <% layout('boilerplate') %>
-<% block('head').append('<link rel="stylesheet" href="css/depositStyles.css">') %>
+<% block('head').append('<link rel="stylesheet" href="css/operationStyles.css">') %>
 <div class="container my-5">
     <div class="row">
-        <form class="col-6 offset-3 form-validation d-flex flex-column"  action="/deposit" method="post" novalidate>
+        <form class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3  col-xl-4 offset-xl-4 form-validation d-flex flex-column p-0 p-md-4" 
+        action="/deposit" method="post" novalidate id="depositForm">
             <div class="text-center mb-5">
                 <h1>Deposit</h1>                
             </div>

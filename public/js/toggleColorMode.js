@@ -12,7 +12,7 @@ const toggleContainer = document.querySelector('.color-mode');
 
 
 const toggleMultiple = (el, ...cls)=> cls.map( cl => el.classList.toggle(cl));
-function applyTheme() {
+const applyTheme = () =>{
     toggleMultiple(header, 'bg-light', 'text-dark');
     toggleMultiple(footer,'bg-light', 'text-dark');
     toggleMultiple(main,'dark','text-light');
@@ -24,7 +24,7 @@ function applyTheme() {
     if(dataRows) {dataRows.forEach(row => row.classList.toggle('border-secondary'))}
 }
 
-function toggle(e){
+const toggle = (e) =>{
     e.preventDefault();
     e.stopPropagation();
     const unchecked = document.querySelector('input[type="radio"]:not(input[type="radio"]:checked)');

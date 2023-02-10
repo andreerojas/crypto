@@ -16,3 +16,12 @@ module.exports.checkReturnTo = (req,res,next)=>{
     }
     next();
 }
+
+module.exports.isWalletEmpty = (req,res,next)=>{
+    console.log('length is:', req.user.wallet.length)
+    if(!req.user.wallet.length){
+        req.flash('error','Your wallet is empty, you cannot withdraw anything');
+        res.redirect('wallet');
+    }
+    next();
+}

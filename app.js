@@ -21,7 +21,7 @@ updateArticles
 const port = 3000;
 const updatePricesPeriod = 24 * 60 * 60 * 1000; // 10 minutes
 const updateArticlesPeriod = 24 * 60 * 60 * 1000; // 1day
-const {isLoggedIn, checkReturnTo} = require('./utilities/middleware');
+const {isLoggedIn, checkReturnTo, isWalletEmpty} = require('./utilities/middleware');
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/crypto')
@@ -152,19 +152,23 @@ app.post('/deposit', isLoggedIn, wrapAsync(async (req,res)=>{
     res.redirect('/wallet')
 }))
 
-app.get('/withdraw', isLoggedIn, wrapAsync(async (req,res)=>{
+app.get('/withdraw', isLoggedIn, isWalletEmpty, wrapAsync(async (req,res)=>{
     res.render('withdraw');
 }))
 
-app.post('/withdraw',isLoggedIn, wrapAsync(async (req,res)=>{
+app.post('/withdraw',isLoggedIn, isWalletEmpty, wrapAsync(async (req,res)=>{
     const {selectedCoinID, amount} = req.body;
     const coin = await Currency.findOne({'API_id' : selectedCoinID});
     const foundUser = await User.findOne({'_id' : req.user._id , 'wallet.currency' : coin._id, 'wallet.qty' : {$gte : amount}});
     if(foundUser){
-        const dada = await User.findOneAndUpdate(   {'_id' : req.user._id , 'wallet.currency' : coin._id, 'wallet.qty' : {$gte : amount}},
-                                                    {$inc : { 'wallet.$.qty' : -amount}})
+        console.log('found')
+        await User.findOneAndUpdate({'_id' : req.user._id , 'wallet.currency' : coin._id, 'wallet.qty' : {$gte : amount}},
+                                                    {$inc : { 'wallet.$.qty' : -amount}});
+        await User.findOneAndUpdate({'_id' : req.user._id , 'wallet.currency' : coin._id},
+                                                    {$pull : {'wallet' : { 'qty' : { $lte : 0}}}})
         req.flash('success', 'withdraw was completed succesfully');
     }else{
+        console.log('not found')
         req.flash('error', 'an error occurred');
     }
     res.redirect('/wallet');

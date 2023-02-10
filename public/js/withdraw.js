@@ -1,4 +1,5 @@
 const equivalentContainer = document.querySelector('.equivalent-container');
+const availabilityContainer = document.querySelector('.availability-container');
 const amount = document.querySelector('#amount');
 const equivalent = document.querySelector('#equivalent');
 const select = document.querySelector('#coins');
@@ -10,9 +11,8 @@ const inputsValidation = ()=>{
     amount.setCustomValidity('');
     amountFeedback.innerText = 'Enter a valid number';
     const asset = userWallet.find( asset  => asset.currency['API_id'] === Number.parseInt(select.value));
-    console.log('here')
     if(!amount.validity.patternMismatch && !amount.validity.valueMissing &&  asset){   
-        if(amount.value > asset.qty){
+        if(amount.value > asset.qty.$numberDecimal){
             amount.setCustomValidity('Funds are not available');
             amountFeedback.innerText = 'Funds are not available';
         }else{
@@ -21,10 +21,20 @@ const inputsValidation = ()=>{
         }
         
     }else{
-        console.log('hideeee')
         equivalentContainer.classList.add('hide');
     }
 };
 
+const showAvailability = ()=>{
+    const selectedAsset = userWallet.find( asset  => asset.currency['API_id'] === Number.parseInt(select.value));
+    console.log(selectedAsset.qty)
+    availabilityContainer.innerText = `You have ${selectedAsset.qty.$numberDecimal} ${selectedAsset.currency.symbol} available in your wallet`
+}
+
 amount.addEventListener('input',inputsValidation);
-select.addEventListener('input',inputsValidation);
+select.addEventListener('input',()=>{ 
+    showAvailability(); 
+    inputsValidation();
+});
+
+showAvailability();
