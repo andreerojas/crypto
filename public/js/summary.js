@@ -34,10 +34,6 @@ for(let heartContainer of heartContainers){
         console.log('change event');
         const action = checkbox.checked ? 'add' : 'remove';
         try{
-            console.log('fav request is: ',{
-                'name' : checkbox.value,
-                'action' : action
-            })
             const response = await axios.post('/favorites',{
                 'name' : checkbox.value,
                 'action' : action

@@ -188,6 +188,16 @@ app.get('/news', isLoggedIn ,wrapAsync(async (req,res)=>{
     res.render('news',{articles});
 }))
 
+app.get('/userEdit',isLoggedIn, wrapAsync(async (req,res)=>{
+    res.render('userEdit')
+}))
+
+app.post('/userEdit', isLoggedIn, wrapAsync(async (req,res)=>{
+    await User.findByIdAndUpdate(req.user._id,req.body['user']);
+    req.flash('success','You personal information was updated');
+    res.redirect('/wallet')
+}))
+
 app.all("*",(req,res,next)=>{
     next(new AppError("page not found",404));
 })

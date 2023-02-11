@@ -1,0 +1,42 @@
+<% layout('boilerplate') %>
+<div class="container-md my-5">
+    <div class="row">
+        <form class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3  col-xl-4 offset-xl-4 form-validation d-flex flex-column"
+          action="/userEdit" method="post" novalidate>
+            <div class="mb-3">
+              <label for="firstName" class="form-label">First name</label>
+              <input type="text" class="form-control" name="user[firstName]" id="firstName" required value="<%= user.firstName %>">
+              <div class="invalid-feedback">
+                Please insert your first name.
+              </div>
+            </div>
+            <div class="mb-3">
+                <label for="lastName" class="form-label">Last name</label>
+                <input type="text" class="form-control" name="user[lastName]" id="lastName" required value="<%= user.lastName %>">
+                <div class="invalid-feedback">
+                    Please insert your last name.
+                  </div>
+            </div>
+            <div class="mb-3">
+              <label for="age" class="form-label">Age</label>
+              <input type="text" class="form-control" name="user[age]" id="age" required value="<%= user.age %>">
+              <div class="invalid-feedback">
+                  Please insert your age.
+                </div>
+            </div>
+            <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="text" class="form-control" name="user[email]" id="email" required value="<%= user.email %>">
+            <div class="invalid-feedback">
+                Please insert your email.
+              </div>
+            </div>
+            <div class="edit-links d-flex justify-content-around mt-3">
+                <a href="/wallet" class="btn btn-primary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Edit</button>
+            </div>
+            
+        </form> 
+    </div>
+</div>
+<% block('body').append('<script src="js/formValidation.js"></script>') %>

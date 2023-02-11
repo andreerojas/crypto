@@ -1,14 +1,15 @@
 h1{
-    font-size: 3rem;
+    font-size: 2rem;
 }
 
-.main-container{
-    flex-grow: 1;
+#main{
+    justify-content: center !important;
 }
+
 
 @media (min-width:768px){
     h1{
-        font-size: 4rem;
+        font-size: 3rem;
     }
 }
 
@@ -18,7 +19,7 @@ h1{
     }
 }
 
-@media (min-width:1200px){
+@media (min-width:1400px){
     h1{
         font-size: 5rem;
     }

@@ -1,30 +1,73 @@
 <% layout('boilerplate') %>
-<div class="container">
-    <div class="row">
-        <div class="col">
-            <h2>My personal info</h2>
-            <p><%=user.firstName%></p>
-            <p><%=user.lastName %></p>
-            <p><%=user.age%></p>
-            <p><%=user.email %></p>
+<% block('head').append('<link rel="stylesheet" href="css/walletStyles.css">') %>
+<div class="container-lg align-self-start h-100">
+    <div class="grid-container p-0 h-100">
+        <div class="info-container card p-0 my-2">
+            <h2 class="card-header fs-2 fw-semibold text-center">Personal info</h2>
+            <img src="/img/generic-user.png" class="card-img-top rounded-circle align-self-center my-3" alt="user picture">
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <div class="fs-6 fw-semibold text-muted">Full name</div>
+                        <div class="fs-4 fw-semibold"><%=user.firstName%> <%=user.lastName %></div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="fs-6 fw-semibold text-muted">Age</div>
+                        <div class="fs-4 fw-semibold"><%=user.age%></div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="fs-6 fw-semibold text-muted">Email</div>
+                        <div class="fs-4 fw-semibold"><%=user.email %></div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="fs-6 fw-semibold text-muted">Amount you are saving</div>
+                        <div class="fs-4 fw-semibold"><%=user.totalMoney%> <%= fiatSymbol %></div>
+                    </li>
+                </ul>
+            </div>
+            <div class="infolinks-container card-footer d-flex justify-content-center align-items-center">
+                <a href="/userEdit" class="btn btn-primary">Edit</a>
+            </div>
         </div>
-        <div class="col">
-            <h2>My favorites</h2>
-            <ul>
-                <%for(let favorite of user.favorites){%>
-                    <li><%= favorite['name'] %></li>
-                <%}%>
-            </ul>
-            
+        <div class="favs-container card  p-0 my-2">
+            <h2 class="card-header fs-2 fw-semibold text-center">My favorites</h2>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    <%for(let favorite of user.favorites){%>
+                        <li class="list-group-item" id="favList-<%= favorite['API_id'] %>">
+                            <div class="fav-name fw-semibold"><%= favorite['name'] %></div>
+                            <div class="fav-price fw-semibold text-muted">1 <%= favorite['symbol'] %> = <%= favorite['price'] %> <%= fiatSymbol %></div>
+                            <label class="fav-remove" for="remove-<%=favorite['API_id']%>">
+                                <input type="checkbox" id="remove-<%=favorite['API_id']%>" name="name" value="<%= favorite['name'] %>">
+                                <i class="bi bi-trash3"></i>
+                            </label>
+                        </li>
+                    <%}%>
+                </ul>
+            </div>
+            <div class="favlinks-container card-footer d-flex justify-content-center align-items-center">
+                <a href="/news" class="btn btn-primary">News</a>
+            </div>
         </div>
-        <div class="col">
-            <h2>My wallet</h2>
-            <ul>
-                <%for(let coin of user.wallet){%>
-                    <li><%= `You have ${coin.qty} ${coin.currency.name} in your wallet` %></li>
-                <%}%>
-            </ul>
+        <div class="wallet-container card p-0 my-2">
+            <h2 class="card-header fs-2 fw-semibold text-center">My wallet</h2>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    <%for(let coin of user.wallet){%>
+                        <li class="list-group-item">
+                            <div class="asset-name fw-semibold"><%= coin['currency']['name'] %></div>
+                            <div class="fw-semibold text-muted text-end">You have</div>
+                            <div class="asset-posession fw-semibold text-end"><%= coin['qty']%> <%=coin['currency']['symbol']%></div>
+                            <div class="asset-equivalence fw-semibold text-muted text-end">1 <%= coin['currency']['symbol'] %> = <%= coin['currency']['price'] %> <%= fiatSymbol %></div>
+                        </li>
+                    <%}%>
+                </ul>
+            </div>
+            <div class="walletlinks-container card-footer d-flex justify-content-around align-items-center">
+                <a href="/deposit" class="btn btn-primary">Deposit</a>
+                <a href="/withdraw" class="btn btn-primary">Withdraw</a>
+            </div>
         </div>
     </div>
-    
 </div>
+<% block('body').append('<script src="js/wallet.js"></script>') %>

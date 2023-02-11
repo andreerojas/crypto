@@ -46,6 +46,10 @@ const userSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref  : 'Currency'
     }]
+}, {toJSON : {virtuals : true}})
+
+userSchema.virtual('totalMoney').get(function(){
+    return this.wallet.reduce((acc, asset) => acc + asset.currency.price * asset.qty, parseFloat(0.0)).toFixed(2);
 })
 
 mongoose.set('strictQuery', true);
@@ -59,7 +63,7 @@ userSchema.plugin(passportLocalMongoose, {
             },
             {
                 path    :   'favorites',
-                select  :   ['API_id','name','logo']
+                select  :   ['API_id','name','symbol','price']
             }]
 });
 const User = mongoose.model('User',userSchema);
