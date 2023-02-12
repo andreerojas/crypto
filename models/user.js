@@ -25,6 +25,16 @@ const userSchema = new Schema({
         type : Number,
         required : true
     },
+    picture  : {
+        type : {
+            url : String,
+            filename : String
+        },
+        default : {
+          url :   '/img/generic-user.png',
+          filename : 'generic-profile-picture'
+        }
+    },
     email    : {
         type : String,
         required : true
@@ -50,6 +60,10 @@ const userSchema = new Schema({
 
 userSchema.virtual('totalMoney').get(function(){
     return this.wallet.reduce((acc, asset) => acc + asset.currency.price * asset.qty, parseFloat(0.0)).toFixed(2);
+})
+
+userSchema.virtual('thumbnail').get(function(){
+    return this.picture.url.replace('/upload','/upload/w_200,h_200');
 })
 
 mongoose.set('strictQuery', true);

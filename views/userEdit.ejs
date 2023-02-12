@@ -2,7 +2,7 @@
 <div class="container-md my-5">
     <div class="row">
         <form class="col-10 offset-1 col-sm-8 offset-sm-2 col-md-6 offset-md-3  col-xl-4 offset-xl-4 form-validation d-flex flex-column"
-          action="/userEdit" method="post" novalidate>
+          action="/userEdit" method="post" novalidate enctype="multipart/form-data">
             <div class="mb-3">
               <label for="firstName" class="form-label">First name</label>
               <input type="text" class="form-control" name="user[firstName]" id="firstName" required value="<%= user.firstName %>">
@@ -17,6 +17,10 @@
                     Please insert your last name.
                   </div>
             </div>
+            <div class="mb-3">
+              <label for="profilePic" class="form-label">Profile picture</label>
+              <input type="file" class="form-control" name="picture" id="profilePic">
+          </div>
             <div class="mb-3">
               <label for="age" class="form-label">Age</label>
               <input type="text" class="form-control" name="user[age]" id="age" required value="<%= user.age %>">

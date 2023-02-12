@@ -17,12 +17,13 @@ const {userValidationSchema, validateUser} = require('./utilities/validationSche
 const flash = require('connect-flash');
 const {updatePrices, fiatSymbol} = require('./utilities/updatePrices')
 const {updateArticles} = require('./utilities/updateArticles');
-updateArticles
 const port = 3000;
-const updatePricesPeriod = 24 * 60 * 60 * 1000; // 10 minutes
+const updatePricesPeriod = 24* 60 * 60 * 1000; // 10 minutes
 const updateArticlesPeriod = 24 * 60 * 60 * 1000; // 1day
 const {isLoggedIn, checkReturnTo, isWalletEmpty} = require('./utilities/middleware');
-
+const multer  = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const {cloudinary} = require('./cloudinary');
 
 mongoose.connect('mongodb://127.0.0.1:27017/crypto')
 .then(()=>{
@@ -192,8 +193,25 @@ app.get('/userEdit',isLoggedIn, wrapAsync(async (req,res)=>{
     res.render('userEdit')
 }))
 
-app.post('/userEdit', isLoggedIn, wrapAsync(async (req,res)=>{
-    await User.findByIdAndUpdate(req.user._id,req.body['user']);
+const storageProfilePics = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        public_id   : (req,file)=> req.user._id.toString(),
+        folder: 'CryptoBay/profilePics',
+        allowed_formats : ['jpg','png','jpeg']
+    },
+});
+
+const uploadProfilePics = multer({ storage : storageProfilePics});
+
+
+
+app.post('/userEdit', isLoggedIn ,uploadProfilePics.single('picture'), wrapAsync(async (req,res)=>{
+    console.log('req.bodyy',req.body, 'fileee',req.file);
+    const {filename, path : url} = req.file; 
+    const update = req.body['user'];
+    update.picture = {filename, url}
+    await User.findByIdAndUpdate(req.user._id, update);
     req.flash('success','You personal information was updated');
     res.redirect('/wallet')
 }))
