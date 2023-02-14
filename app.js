@@ -13,7 +13,7 @@ const AppError = require('./utilities/AppError');
 const flash = require('connect-flash');
 const {updatePrices, fiatSymbol} = require('./utilities/updatePrices')
 const {updateArticles} = require('./utilities/updateArticles');
-const port = 3000;
+const port = process.env.PORT || 3000
 const updatePricesPeriod = 24 * 60 * 60 * 1000; // 10 minutes
 const updateArticlesPeriod = 24 * 60 * 60 * 1000; // 1day
 const generalRoutes = require('./routes/generalRoutes');
@@ -75,6 +75,7 @@ app.use((err,req,res,next)=>{
     if(!err.status) err.status = 405;
     res.status(err.status).send(`error is: ${err.message}`);
 })
+
 
 app.listen(port, ()=>{
     console.log(`Listening on port ${port}`);
