@@ -1,11 +1,31 @@
 <% layout('boilerplate') %>
 <div class="container">
     <%for(let article of articles){%>
-        <div>
-            <h2><%= article.coinName %></h2>
-            <ul>
+        <div class="card mt-1 mb-3">
+            <div class="card-header">
+              <h2 class="card-title"><%= article.coinName %></h2>
+            </div>
+            <ul class="card-body list-group list-group-flush">
                 <%for(let coinArticle of article.coinArticles){%>
-                    <li><%= coinArticle.title %></li>
+                    <li class="list-group-item">
+                        <div class="card mb-3 border-0">
+                            <div class="row g-0">
+                                <div class="col-12 col-sm-4">
+                                    <picture>
+                                        <source srcset="<%= coinArticle.urlToImage %>">
+                                        <img src="img/generic-crypto.jpg" alt="Generic crypto image" class="rounded-start img-fluid">
+                                    </picture>
+                                </div>
+                                <div class="col-12 col-sm-8">
+                                    <div class="card-body py-1 h-100">
+                                        <a href="<%= coinArticle.url %>" target="_blank" rel="noopener noreferrer" class="text-body text-decoration-none"><h3 class="card-title"><%= coinArticle.title %></h3></a>
+                                        <p class="card-text"><%= coinArticle.description %></p>
+                                        <p class="card-text"><small class="text-muted">Published <%= coinArticle.publishedAt.toLocaleDateString(); %> by <%= coinArticle.author %></small></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>   
+                    </li>   
                 <%}%>
             </ul>
         </div>

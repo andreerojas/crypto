@@ -24,3 +24,19 @@ module.exports.supportedCurrencies = [
     { name : "Monero" , id : 328 },
     { name : "Ethereum Classic" , id : 1321 }
 ]
+
+// module.exports.supportedCurrencies = [
+//     { name : "Dogecoin" , id : 74 }
+// ]
+
+module.exports.sources = [
+    'coindesk.com',
+    'finance.yahoo.com',
+    'cryptodaily.co.uk',
+    'coinjournal.net',
+    'seekingalpha.com',
+    'newsbtc.com',
+    'ccn.com',
+    'cryptopolitan.com',
+    'cointelegraph.com',
+    'markets.businessinsider.com']

@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const passportLocalMongoose = require('passport-local-mongoose');
-const Currency = require('./currency')
 
 const getQtyDecimals = (v)=>{
     const value = Number.parseFloat(v).toFixed(5);
@@ -63,7 +62,7 @@ userSchema.virtual('totalMoney').get(function(){
 })
 
 userSchema.virtual('thumbnail').get(function(){
-    return this.picture.url.replace('/upload','/upload/w_200,h_200');
+    return this.picture.url.replace('upload','upload/c_fill,g_faces,h_200,w_200');
 })
 
 mongoose.set('strictQuery', true);

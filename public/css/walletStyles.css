@@ -6,7 +6,7 @@
 }
 
 .info-container img{
-    width: 40%;
+    width: 50%;
 }
 
 .favs-container div ul li{
@@ -88,11 +88,5 @@ li .asset-equivalence{
     }
     .list-group-flush>.list-group-item:last-child{
         border-bottom-width: 1px;
-    }
-}
-
-@media( min-width : 1200px){
-    .info-container img{
-        width: 30%;
     }
 }

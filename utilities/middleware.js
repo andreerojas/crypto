@@ -26,17 +26,4 @@ module.exports.isWalletEmpty = (req,res,next)=>{
     next();
 }
 
-// const { CloudinaryStorage } = require('multer-storage-cloudinary');
-// module.exports.uploadProfilePicID = (req,res,next)=>{
-//     req.session.storageProfilePics = new CloudinaryStorage({
-//         cloudinary: cloudinary,
-//         params: {
-//             public_id   : req.user._id,
-//             folder: 'CryptoBay/profilePics',
-//             allowed_formats : ['jpg','png','jpeg']
-//         },
-//     });
-//     next();
-// }
-    
 

@@ -23,8 +23,8 @@ const now = new Date();
 now.setDate(now.getDate()-1);
 const yesterday = now.toISOString();
 
-
-mongoose.connect('mongodb://127.0.0.1:27017/crypto')
+const mongoURL = process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/crypto';
+mongoose.connect(mongoURL)
 .then(async ()=>{
     console.log("CONNECTED TO DATABASE");
     await updateCurrenciesData();

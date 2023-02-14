@@ -22,10 +22,10 @@ const articleSchema = new Schema({
     publishedAt     :{
         type        : Date
     },
-    currency        :[{
+    currency        :{
         type        : Schema.Types.ObjectId,
         ref  : 'Currency'
-    }]
+    }
 },{timestamps : true})
 
 mongoose.set('strictQuery', true);
