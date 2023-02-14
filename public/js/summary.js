@@ -31,7 +31,6 @@ for(let heartContainer of heartContainers){
     const checkbox = heartContainer.children[0];
     checkbox.checked = userFavs.includes(checkbox.id.match(/\d+/)[0]);
     checkbox.addEventListener('change',async (e)=>{
-        console.log('change event');
         const action = checkbox.checked ? 'add' : 'remove';
         try{
             const response = await axios.post('/favorites',{

@@ -1,6 +1,8 @@
 const {supportedCurrencies} = require('./currenciesList');
 const axios = require('axios');
-require('dotenv').config();
+if(process.env.NODE_ENV !== 'production'){
+    require('dotenv').config();
+}
 const mongoose = require('mongoose');
 const Currency = require('../models/currency')
 const Article = require('../models/article');
@@ -61,7 +63,7 @@ const updateArticles = async ()=>{
         for(let name of supportedCurrenciesName){
             const API_id = supportedCurrencies.find(curr => curr.name === name).id;
             const currency = await Currency.findOne({'API_id' : API_id});
-            const queryURL = `${baseURLArticles}q=%22${name.replaceAll(' ','%20')}%22&searchIn=title&language=en&sortBy=popularity&domains=${sources}&pageSize=${numArticles}&from=${yesterday}`
+            const queryURL = `${baseURLArticles}q=%22${name.replaceAll(' ','%20')}%22&searchIn=title&language=en&sortBy=popularity&pageSize=${numArticles}&from=${yesterday}`
             const {data : response} = await axios.get(queryURL, configArticles);
             for(let article of response.articles){
                 const {author, title,description, url, urlToImage, publishedAt} = article;

@@ -1,7 +1,9 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-require('dotenv').config();
+if(process.env.NODE_ENV !== 'production'){
+    require('dotenv').config();
+}
 const session = require('express-session');
 const mongoose = require('mongoose');
 const mongoSessionStore = require('connect-mongo');
@@ -14,7 +16,7 @@ const flash = require('connect-flash');
 const {updatePrices, fiatSymbol} = require('./utilities/updatePrices')
 const {updateArticles} = require('./utilities/updateArticles');
 const port = process.env.PORT || 3000
-const updatePricesPeriod = 24 * 60 * 60 * 1000; // 10 minutes
+const updatePricesPeriod = 20 * 60 * 1000; // 10 minutes
 const updateArticlesPeriod = 24 * 60 * 60 * 1000; // 1day
 const generalRoutes = require('./routes/generalRoutes');
 const userRoutes = require('./routes/userRoutes');

@@ -27,7 +27,6 @@ const inputsValidation = ()=>{
 
 const showAvailability = ()=>{
     const selectedAsset = userWallet.find( asset  => asset.currency['API_id'] === Number.parseInt(select.value));
-    console.log(selectedAsset.qty)
     availabilityContainer.innerText = `You have ${selectedAsset.qty.$numberDecimal} ${selectedAsset.currency.symbol} available in your wallet`
 }
 

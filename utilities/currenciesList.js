@@ -25,10 +25,6 @@ module.exports.supportedCurrencies = [
     { name : "Ethereum Classic" , id : 1321 }
 ]
 
-// module.exports.supportedCurrencies = [
-//     { name : "Dogecoin" , id : 74 }
-// ]
-
 module.exports.sources = [
     'coindesk.com',
     'finance.yahoo.com',

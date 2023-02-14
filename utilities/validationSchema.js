@@ -15,7 +15,6 @@ const userValidationSchema = Joi.object({
 const validateUser = (req,res,next)=>{
     const {error} = userValidationSchema.validate(req.body);
     if(error){
-        console.log('detailes are: ',error.details)
         const msg = error.details.map(el => el.message).join(',');
         throw new AppError(msg, 400);
     }else{
